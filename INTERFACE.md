@@ -6,7 +6,7 @@
 | `optical_illusion_generator.py` | Original app: PatternConfig, Spiral/Interference/OpticalIllusion generators, OpticalIllusionApp |
 | `optical_illusion_generator_V2.py` | V2 app: own Spiral/Interference; imports OpticalIllusion, Fractal, MathematicalCurves generators and presets from `patterns/` |
 | `enhanced_pattern_generator.py`, `enhanced_pattern_generator_V2.py` | Enhanced apps (genetic algorithm, aesthetic analyser, more generators) |
-| `advanced_pattern_generator.py` | "Mathematical Art Studio" (AdvancedArtStudio) with its own copies of the generators in `patterns/`; presets from `patterns/presets.py` (2,677 lines, pre-existing) |
+| `advanced_pattern_generator.py` | "Mathematical Art Studio" (AdvancedArtStudio, the tkinter app); generators from `patterns/`, config from `config.py`, presets from `patterns/presets.py` |
 | `config.py` | PatternConfig dataclass, ColorManager (palettes, HSV palette, interpolation) |
 
 ## `patterns/` (Tk-free generators; each class has `get_parameters()` and `generate(**params) -> RGB array`)

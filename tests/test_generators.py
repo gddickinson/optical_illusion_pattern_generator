@@ -108,3 +108,17 @@ def test_kanizsa_original_script_same_fix():
     r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=ROOT,
                        env=dict(os.environ, MPLBACKEND="Agg"), timeout=60)
     assert r.returncode == 0 and "ok" in r.stdout, r.stderr[-600:]
+
+
+@pytest.mark.skipif(NO_TK, reason="tkinter or a display not available")
+def test_advanced_script_uses_the_patterns_package():
+    """advanced_pattern_generator.py kept its own copies of the patterns/ generators (already drifting apart);
+    it must use the shared classes so the desktop app, the package and the web stay the same."""
+    code = ("import sys; sys.path.insert(0, %r)\nimport advanced_pattern_generator as a, patterns, config\n"
+            "names = ['IslamicGeometryGenerator', 'VoronoiGenerator', 'CellularAutomataGenerator', 'TessellationGenerator',"
+            " 'SpiralGenerator', 'InterferenceGenerator', 'PatternGenerator']\n"
+            "assert all(getattr(a, n) is getattr(patterns, n) for n in names), [n for n in names if getattr(a, n) is not getattr(patterns, n)]\n"
+            "assert a.PatternConfig is config.PatternConfig and a.ColorManager is config.ColorManager\nprint('ok')\n") % str(ROOT)
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=ROOT,
+                       env=dict(os.environ, MPLBACKEND="Agg"), timeout=60)
+    assert r.returncode == 0 and "ok" in r.stdout, r.stderr[-600:]
