@@ -13,7 +13,7 @@ An interactive desktop application for generating mathematical patterns, fractal
 - **Optical Illusions** (V2): Hermann Grid, Scintillating Grid, Fraser Spiral, Cafe Wall, Zollner, Muller-Lyer, Kanizsa Triangle, Rotating Snakes, Impossible (Penrose) Triangle
 - **Fractals** (V2): Mandelbrot and Julia sets, Sierpinski triangles, Barnsley Ferns, Dragon Curves
 - **Mathematical Curves** (V2): Lissajous figures, Rose curves, Epicycloids, Hypocycloids, Cardioids, Astroids, Cycloids
-- **Generative Art** (Advanced version): Islamic geometric patterns, Voronoi diagrams (with Lloyd relaxation), cellular automata (Game of Life, elementary rules 30/90/110, Brian's Brain, Langton's ant) and tessellations (regular, hexagonal, triangular, Truchet, and random Penrose-style rhombi / Ammann-Beenker-style octagons)
+- **Generative Art** (Advanced version): Islamic geometric patterns, Voronoi diagrams (with Lloyd relaxation), cellular automata (Game of Life, elementary rules 30/90/110, Brian's Brain, Langton's ant) and tessellations (regular, hexagonal, triangular, Truchet, and the aperiodic Penrose P3 and Ammann-Beenker rhomb tilings)
 
 ### Tools and Controls
 

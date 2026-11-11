@@ -1,8 +1,8 @@
 """
 Tessellation pattern generator.
 
-Supports regular, Penrose, hexagonal, triangular, Ammann-Beenker, and Truchet
-tilings with configurable irregularity, color schemes, borders, and fill patterns.
+Supports regular, Penrose (P3), hexagonal, triangular, Ammann-Beenker, and Truchet
+tilings (the two aperiodic ones from patterns/aperiodic.py) with configurable irregularity, color schemes, borders, and fill patterns.
 """
 
 import logging
@@ -12,6 +12,7 @@ from typing import Dict, Any
 
 from config import ColorManager
 from patterns.base import PatternGenerator
+from patterns.aperiodic import penrose_p3, ammann_beenker
 
 logger = logging.getLogger(__name__)
 
@@ -129,23 +130,12 @@ class TessellationGenerator(PatternGenerator):
                     self._apply_border(ax, triangle, border_style)
 
     def _generate_penrose_tiling(self, ax, size, color_scheme, border_style):
+        """Penrose P3 rhomb tiling (de Bruijn pentagrid), edge length `size`: thin rhombs colour 0, thick colour 1."""
         colors = ColorManager.get_palette(self.config.color_palette, 2)
-        phi = (1 + np.sqrt(5)) / 2
-        num_tiles = int(100 / (size * size))
-        for _ in range(num_tiles):
-            x_center = np.random.uniform(-1, 1)
-            y_center = np.random.uniform(-1, 1)
-            orientation = np.random.uniform(0, 360)
-            if np.random.random() < 0.5:
-                rhombus = self._create_rhombus(x_center, y_center, size, size / phi, orientation, 72)
-                color = colors[0]
-            else:
-                rhombus = self._create_rhombus(x_center, y_center, size, size * phi, orientation, 36)
-                color = colors[1]
-            if self.config.color_mode == 'color':
-                ax.fill(rhombus[:, 0], rhombus[:, 1], color=color, alpha=0.8)
-            else:
-                ax.fill(rhombus[:, 0], rhombus[:, 1], color=self.config.foreground_color, alpha=0.8)
+        for thick, corners in penrose_p3(size):
+            rhombus = np.array(corners + [corners[0]])
+            color = colors[1 if thick else 0] if self.config.color_mode == 'color' else self.config.foreground_color
+            ax.fill(rhombus[:, 0], rhombus[:, 1], color=color, alpha=0.8)
             self._apply_border(ax, rhombus, border_style)
 
     def _generate_hexagonal_tessellation(self, ax, size, irregularity, color_scheme, border_style, fill_pattern):
@@ -189,19 +179,14 @@ class TessellationGenerator(PatternGenerator):
                 self._apply_border(ax, triangle, border_style)
 
     def _generate_ammann_beenker(self, ax, size, color_scheme, border_style):
+        """Ammann-Beenker tiling of 45/135-degree rhombs (colour 0) and squares (colour 1), edge length `size`
+        (de Bruijn 4-grid)."""
         colors = ColorManager.get_palette(self.config.color_palette, 2)
-        num_tiles = int(50 / (size * size))
-        for _ in range(num_tiles):
-            x_center = np.random.uniform(-1, 1)
-            y_center = np.random.uniform(-1, 1)
-            if np.random.random() < 0.6:
-                octagon = self._create_regular_polygon(8, size, x_center, y_center, np.random.uniform(0, 45))
-                color = colors[0] if self.config.color_mode == 'color' else self.config.foreground_color
-                ax.fill(octagon[:, 0], octagon[:, 1], color=color, alpha=0.8)
-            else:
-                square = self._create_square(x_center, y_center, size * 0.7)
-                color = colors[1] if self.config.color_mode == 'color' else self.config.foreground_color
-                ax.fill(square[:, 0], square[:, 1], color=color, alpha=0.8)
+        for square, corners in ammann_beenker(size):
+            tile = np.array(corners + [corners[0]])
+            color = colors[1 if square else 0] if self.config.color_mode == 'color' else self.config.foreground_color
+            ax.fill(tile[:, 0], tile[:, 1], color=color, alpha=0.8)
+            self._apply_border(ax, tile, border_style)
 
     def _generate_truchet_tiles(self, ax, size, color_scheme, border_style):
         colors = ColorManager.get_palette(self.config.color_palette, 4)
@@ -248,17 +233,6 @@ class TessellationGenerator(PatternGenerator):
                 [x_center + size / 2, y_center + height * 1 / 3],
                 [x_center, y_center - height * 2 / 3]
             ])
-
-    def _create_rhombus(self, x_center, y_center, width, height, rotation, acute_angle):
-        rot_rad = np.radians(rotation)
-        half_w, half_h = width / 2, height / 2
-        vertices = np.array([[-half_w, 0], [0, half_h], [half_w, 0], [0, -half_h], [-half_w, 0]])
-        cos_r, sin_r = np.cos(rot_rad), np.sin(rot_rad)
-        rotation_matrix = np.array([[cos_r, -sin_r], [sin_r, cos_r]])
-        rotated = vertices @ rotation_matrix.T
-        rotated[:, 0] += x_center
-        rotated[:, 1] += y_center
-        return rotated
 
     def _create_regular_polygon(self, n_sides, radius, x_center, y_center, rotation):
         angles = np.linspace(0, 2 * np.pi, n_sides + 1) + np.radians(rotation)

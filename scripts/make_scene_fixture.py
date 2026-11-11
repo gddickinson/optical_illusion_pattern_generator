@@ -58,6 +58,8 @@ EXTRA = [
     ("tessellation", {"tessellation_type": "hexagonal", "irregularity": 0.2, "border_style": "thick"}),
     ("tessellation", {"tessellation_type": "triangular", "irregularity": 0.3, "color_scheme": "random"}),
     ("tessellation", {"base_shape": "square", "irregularity": 0.25}),
+    ("tessellation", {"tessellation_type": "penrose", "tile_size": 0.15, "border_style": "thick"}),
+    ("tessellation", {"tessellation_type": "ammann_beenker", "tile_size": 0.15}),
 ]
 
 

@@ -1,9 +1,9 @@
-// TessellationGenerator (patterns/tessellation.py), ported line by line, including its random draws (irregularity,
-// 'random' colours, and the scattered rhombi/octagons of the 'penrose' and 'ammann_beenker' types).
+// TessellationGenerator (patterns/tessellation.py), ported line by line, including its random draws (irregularity and
+// 'random' colours); the aperiodic 'penrose' and 'ammann_beenker' tilings come from aperiodic.js.
 import { subplots } from './scene.js';
 import { getPalette } from './colors.js';
-import { linspace, mean, radians, range } from './np.js';
-import { polygon } from './gen_islamic.js';
+import { linspace, mean, range } from './np.js';
+import { penroseP3, ammannBeenker } from './aperiodic.js';
 
 export const TESSELLATION_DEFAULTS = { tessellation_type: 'regular', base_shape: 'hexagon', tile_size: 0.1, irregularity: 0.0,
   color_scheme: 'alternating', border_style: 'thin', fill_pattern: 'solid' };
@@ -25,10 +25,6 @@ const square = (cx, cy, s) => { const h = s / 2; return [[cx - h, cy - h], [cx +
 function triangle(cx, cy, s, up) {
   const h = s * Math.sqrt(3) / 2, k = up ? 1 : -1;
   return [[cx, cy + k * (h * 2 / 3)], [cx - s / 2, cy - k * (h * 1 / 3)], [cx + s / 2, cy - k * (h * 1 / 3)], [cx, cy + k * (h * 2 / 3)]];
-}
-function rhombus(cx, cy, w, h, rot) {
-  const r = radians(rot), c = Math.cos(r), s = Math.sin(r), hw = w / 2, hh = h / 2;
-  return [[-hw, 0], [0, hh], [hw, 0], [0, -hh], [-hw, 0]].map(([x, y]) => [x * c + y * -s + cx, x * s + y * c + cy]);
 }
 const X = pts => pts.map(v => v[0]), Y = pts => pts.map(v => v[1]);
 
@@ -108,28 +104,20 @@ class Tiler {
   }
   hexagonal() { this.hexGrid(getPalette(this.cfg.color_palette, 8), true); }
   triangular() { this.triGrid(getPalette(this.cfg.color_palette, 4), true); }
-  penrose() {
-    const colors = getPalette(this.cfg.color_palette, 2), phi = (1 + Math.sqrt(5)) / 2, size = this.q.tile_size, r = this.rnd;
-    for (let k = 0; k < Math.trunc(100 / (size * size)); k++) {
-      const cx = r.uniform(-1, 1), cy = r.uniform(-1, 1), rot = r.uniform(0, 360);
-      const thin = r.random() < 0.5;
-      const rh = thin ? rhombus(cx, cy, size, size / phi, rot) : rhombus(cx, cy, size, size * phi, rot);
-      const color = this.cfg.color_mode === 'color' ? colors[thin ? 0 : 1] : this.cfg.foreground_color;
-      this.ax.fill(X(rh), Y(rh), { color, alpha: 0.8 });
+  penrose() { // Penrose P3 (aperiodic.js): thin rhombs colour 0, thick colour 1
+    const colors = getPalette(this.cfg.color_palette, 2);
+    for (const [thick, c] of penroseP3(this.q.tile_size)) {
+      const rh = [...c, c[0]];
+      this.ax.fill(X(rh), Y(rh), { color: this.cfg.color_mode === 'color' ? colors[thick ? 1 : 0] : this.cfg.foreground_color, alpha: 0.8 });
       this.border(rh);
     }
   }
-  ammann() {
-    const colors = getPalette(this.cfg.color_palette, 2), size = this.q.tile_size, r = this.rnd, c = this.cfg;
-    for (let k = 0; k < Math.trunc(50 / (size * size)); k++) {
-      const cx = r.uniform(-1, 1), cy = r.uniform(-1, 1);
-      if (r.random() < 0.6) {
-        const oct = polygon(8, size, cx, cy, r.uniform(0, 45));
-        this.ax.fill(X(oct), Y(oct), { color: c.color_mode === 'color' ? colors[0] : c.foreground_color, alpha: 0.8 });
-      } else {
-        const sq = square(cx, cy, size * 0.7);
-        this.ax.fill(X(sq), Y(sq), { color: c.color_mode === 'color' ? colors[1] : c.foreground_color, alpha: 0.8 });
-      }
+  ammann() { // Ammann-Beenker (aperiodic.js): rhombs colour 0, squares colour 1
+    const colors = getPalette(this.cfg.color_palette, 2);
+    for (const [square, c] of ammannBeenker(this.q.tile_size)) {
+      const t = [...c, c[0]];
+      this.ax.fill(X(t), Y(t), { color: this.cfg.color_mode === 'color' ? colors[square ? 1 : 0] : this.cfg.foreground_color, alpha: 0.8 });
+      this.border(t);
     }
   }
   truchet() {

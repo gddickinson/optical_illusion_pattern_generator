@@ -20,7 +20,7 @@ route('check', async (args, q) => {
   </div>
   <div class="panel small" id="params"></div>
   <div class="callout a small">The same comparison runs as an automated test: <code>web/static/engine.test.mjs</code> replays
-  132 cases recorded from the Python generators (every variant in black-and-white and colour, plus extra options) and
+  the cases recorded from the Python generators (every variant in black-and-white and colour, plus extra options) and
   checks that the engine makes the same drawing calls with the same coordinates and colours, to 1e-9.</div>`;
   const pick = document.getElementById('pick');
   pick.innerHTML = list(cat.generators, g => `<div class="pick"><b>${esc(g.name)}</b>${list(g.variants, v =>

@@ -122,3 +122,62 @@ def test_advanced_script_uses_the_patterns_package():
     r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=ROOT,
                        env=dict(os.environ, MPLBACKEND="Agg"), timeout=60)
     assert r.returncode == 0 and "ok" in r.stdout, r.stderr[-600:]
+
+
+class _AxLog(_FillLog):
+    def plot(self, *a, **k):
+        pass
+
+
+def _tiles(method, size):
+    from patterns.tessellation import TessellationGenerator
+    ax = _AxLog()
+    getattr(TessellationGenerator(PatternConfig()), method)(ax, size, "alternating", "thin")
+    return [np.column_stack([x, y])[:4] for x, y in ax.fills]
+
+
+def _angles(q):
+    out = []
+    for i in range(4):
+        a, b, c = q[i - 1], q[i], q[(i + 1) % 4]
+        u, v = a - b, c - b
+        out.append(round(float(np.degrees(np.arccos(np.dot(u, v) / np.hypot(*u) / np.hypot(*v)))), 6))
+    return out
+
+
+@pytest.mark.parametrize("method,allowed,size", [
+    ("_generate_penrose_tiling", [[36, 144], [72, 108]], 0.12),
+    ("_generate_ammann_beenker", [[45, 135], [90]], 0.12),
+])
+def test_aperiodic_tilings_are_real_tilings(method, allowed, size):
+    """'penrose' and 'ammann_beenker' scattered random, overlapping rhombi/octagons. They must be edge-to-edge
+    tilings: all edges of length tile_size, only the P3 (36/72/108/144) or Ammann-Beenker (45/90/135) angles, every
+    interior edge shared by exactly two tiles and the tile angles at every interior vertex summing to 360."""
+    quads = _tiles(method, size)
+    assert len(quads) > 50
+    edges, corner = {}, {}
+    key = lambda p: (round(p[0] / size, 5), round(p[1] / size, 5))  # noqa: E731
+    for q in quads:
+        assert np.allclose([np.hypot(*(q[i] - q[i - 1])) for i in range(4)], size, rtol=1e-9)
+        ang = _angles(q)
+        assert sorted(set(round(a) for a in ang)) in allowed and abs(sum(ang) - 360) < 1e-6
+        for i in range(4):
+            e = tuple(sorted([key(q[i]), key(q[(i + 1) % 4])]))
+            edges[e] = edges.get(e, 0) + 1
+            corner[key(q[i])] = corner.get(key(q[i]), 0) + ang[i]
+    assert max(edges.values()) <= 2
+    inner = 0.6 / size
+    for e, n in edges.items():
+        if all(abs(c) < inner for p in e for c in p):
+            assert n == 2, e
+    for v, total in corner.items():
+        if abs(v[0]) < inner and abs(v[1]) < inner:
+            assert abs(total - 360) < 1e-4, (v, total)
+    assert _tiles(method, size) and [q.tolist() for q in _tiles(method, size)] == [q.tolist() for q in quads]
+
+
+def test_penrose_thick_to_thin_ratio_is_golden():
+    from patterns.aperiodic import penrose_p3
+    tiles = [t for t in penrose_p3(0.02) if all(abs(c) < 0.8 for xy in t[1] for c in xy)]
+    thick = sum(t[0] for t in tiles)
+    assert abs(thick / (len(tiles) - thick) - (1 + 5 ** 0.5) / 2) < 0.08
