@@ -2,7 +2,8 @@
 Islamic geometric pattern generator.
 
 Generates octagon-star, hexagon-flower, square Kufic, Girih tiles,
-and Moroccan Zellige patterns with interlacing and symmetry options.
+and Moroccan Zellige patterns with interlacing and symmetry options
+(symmetry p1/p2/p4/p6: lattice and n-fold tile symmetry from patterns/symmetry.py).
 """
 
 import logging
@@ -12,6 +13,7 @@ from typing import Dict, Any
 
 from config import ColorManager
 from patterns.base import PatternGenerator
+from patterns.symmetry import tiles
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +44,7 @@ class IslamicGeometryGenerator(PatternGenerator):
             rotation = kwargs.get('rotation', 0)
             interlace = kwargs.get('interlace', 'simple')
             detail = kwargs.get('ornament_detail', 1.0)
+            self._symmetry = kwargs.get('symmetry', 'p4')
 
             if not self.validate_parameters(**kwargs):
                 raise ValueError("Invalid parameters")
@@ -77,75 +80,60 @@ class IslamicGeometryGenerator(PatternGenerator):
 
     def _generate_octagon_star(self, ax, size, rep_x, rep_y, rotation, interlace, detail):
         colors = ColorManager.get_palette(self.config.color_palette, 4)
-        for i in range(rep_x):
-            for j in range(rep_y):
-                x_center = -1 + (i + 0.5) * 2 / rep_x
-                y_center = -1 + (j + 0.5) * 2 / rep_y
-                octagon = self._create_regular_polygon(8, size, x_center, y_center, rotation)
-                color = colors[0] if self.config.color_mode == 'color' else self.config.foreground_color
-                ax.fill(octagon[:, 0], octagon[:, 1], color=color, alpha=0.8, edgecolor='black', linewidth=self.config.line_width)
-                star = self._create_star(8, size * 0.6, size * 0.3, x_center, y_center, rotation + 22.5)
-                color = colors[1] if self.config.color_mode == 'color' else self.config.foreground_color
-                ax.fill(star[:, 0], star[:, 1], color=color, alpha=0.9, edgecolor='black', linewidth=self.config.line_width)
-                if interlace != 'none':
-                    self._add_interlace_pattern(ax, x_center, y_center, size, detail, colors[2:])
+        for x_center, y_center, i, j, tile in tiles(ax, rep_x, rep_y, self._symmetry):
+            octagon = self._create_regular_polygon(8, size, x_center, y_center, rotation)
+            color = colors[0] if self.config.color_mode == 'color' else self.config.foreground_color
+            tile.fill(octagon[:, 0], octagon[:, 1], color=color, alpha=0.8, edgecolor='black', linewidth=self.config.line_width)
+            star = self._create_star(8, size * 0.6, size * 0.3, x_center, y_center, rotation + 22.5)
+            color = colors[1] if self.config.color_mode == 'color' else self.config.foreground_color
+            tile.fill(star[:, 0], star[:, 1], color=color, alpha=0.9, edgecolor='black', linewidth=self.config.line_width)
+            if interlace != 'none':
+                self._add_interlace_pattern(tile, x_center, y_center, size, detail, colors[2:])
 
     def _generate_hexagon_flower(self, ax, size, rep_x, rep_y, rotation, detail):
         colors = ColorManager.get_palette(self.config.color_palette, 6)
-        for i in range(rep_x):
-            for j in range(rep_y):
-                x_center = -1 + (i + 0.5) * 2 / rep_x
-                y_center = -1 + (j + 0.5) * 2 / rep_y
-                hexagon = self._create_regular_polygon(6, size, x_center, y_center, rotation)
-                color = colors[0] if self.config.color_mode == 'color' else self.config.foreground_color
-                ax.fill(hexagon[:, 0], hexagon[:, 1], color=color, alpha=0.8, edgecolor='black', linewidth=self.config.line_width)
-                for k in range(6):
-                    angle = k * 60 + rotation
-                    petal_x = x_center + size * 0.8 * np.cos(np.radians(angle))
-                    petal_y = y_center + size * 0.8 * np.sin(np.radians(angle))
-                    petal = self._create_petal(size * 0.4, petal_x, petal_y, angle)
-                    color = colors[(k + 1) % len(colors)] if self.config.color_mode == 'color' else self.config.foreground_color
-                    ax.fill(petal[:, 0], petal[:, 1], color=color, alpha=0.7, edgecolor='black', linewidth=self.config.line_width * 0.5)
+        for x_center, y_center, i, j, tile in tiles(ax, rep_x, rep_y, self._symmetry):
+            hexagon = self._create_regular_polygon(6, size, x_center, y_center, rotation)
+            color = colors[0] if self.config.color_mode == 'color' else self.config.foreground_color
+            tile.fill(hexagon[:, 0], hexagon[:, 1], color=color, alpha=0.8, edgecolor='black', linewidth=self.config.line_width)
+            for k in range(6):
+                angle = k * 60 + rotation
+                petal_x = x_center + size * 0.8 * np.cos(np.radians(angle))
+                petal_y = y_center + size * 0.8 * np.sin(np.radians(angle))
+                petal = self._create_petal(size * 0.4, petal_x, petal_y, angle)
+                color = colors[(k + 1) % len(colors)] if self.config.color_mode == 'color' else self.config.foreground_color
+                tile.fill(petal[:, 0], petal[:, 1], color=color, alpha=0.7, edgecolor='black', linewidth=self.config.line_width * 0.5)
 
     def _generate_square_kufic(self, ax, size, rep_x, rep_y, rotation, detail):
         colors = ColorManager.get_palette(self.config.color_palette, 3)
-        for i in range(rep_x):
-            for j in range(rep_y):
-                x_center = -1 + (i + 0.5) * 2 / rep_x
-                y_center = -1 + (j + 0.5) * 2 / rep_y
-                self._create_kufic_element(ax, x_center, y_center, size, rotation, detail, colors)
+        for x_center, y_center, i, j, tile in tiles(ax, rep_x, rep_y, self._symmetry):
+            self._create_kufic_element(tile, x_center, y_center, size, rotation, detail, colors)
 
     def _generate_girih_tiles(self, ax, size, rep_x, rep_y, rotation, detail):
         colors = ColorManager.get_palette(self.config.color_palette, 5)
-        for i in range(rep_x):
-            for j in range(rep_y):
-                x_center = -1 + (i + 0.5) * 2 / rep_x
-                y_center = -1 + (j + 0.5) * 2 / rep_y
-                decagon = self._create_regular_polygon(10, size, x_center, y_center, rotation)
-                color = colors[0] if self.config.color_mode == 'color' else self.config.foreground_color
-                ax.fill(decagon[:, 0], decagon[:, 1], color=color, alpha=0.7, edgecolor='black', linewidth=self.config.line_width)
-                for k in range(5):
-                    angle = k * 72 + rotation
-                    bowtie_x = x_center + size * 0.7 * np.cos(np.radians(angle))
-                    bowtie_y = y_center + size * 0.7 * np.sin(np.radians(angle))
-                    bowtie = self._create_bowtie(size * 0.3, bowtie_x, bowtie_y, angle)
-                    color = colors[(k + 1) % len(colors)] if self.config.color_mode == 'color' else self.config.foreground_color
-                    ax.fill(bowtie[:, 0], bowtie[:, 1], color=color, alpha=0.8, edgecolor='black', linewidth=self.config.line_width * 0.5)
+        for x_center, y_center, i, j, tile in tiles(ax, rep_x, rep_y, self._symmetry):
+            decagon = self._create_regular_polygon(10, size, x_center, y_center, rotation)
+            color = colors[0] if self.config.color_mode == 'color' else self.config.foreground_color
+            tile.fill(decagon[:, 0], decagon[:, 1], color=color, alpha=0.7, edgecolor='black', linewidth=self.config.line_width)
+            for k in range(5):
+                angle = k * 72 + rotation
+                bowtie_x = x_center + size * 0.7 * np.cos(np.radians(angle))
+                bowtie_y = y_center + size * 0.7 * np.sin(np.radians(angle))
+                bowtie = self._create_bowtie(size * 0.3, bowtie_x, bowtie_y, angle)
+                color = colors[(k + 1) % len(colors)] if self.config.color_mode == 'color' else self.config.foreground_color
+                tile.fill(bowtie[:, 0], bowtie[:, 1], color=color, alpha=0.8, edgecolor='black', linewidth=self.config.line_width * 0.5)
 
     def _generate_morocco_zellige(self, ax, size, rep_x, rep_y, rotation, detail):
         colors = ColorManager.get_palette('ocean', 8)
-        for i in range(rep_x):
-            for j in range(rep_y):
-                x_center = -1 + (i + 0.5) * 2 / rep_x
-                y_center = -1 + (j + 0.5) * 2 / rep_y
-                if (i + j) % 2 == 0:
-                    star = self._create_star(8, size, size * 0.5, x_center, y_center, rotation)
-                    color = colors[0] if self.config.color_mode == 'color' else self.config.foreground_color
-                    ax.fill(star[:, 0], star[:, 1], color=color, alpha=0.8, edgecolor='white', linewidth=self.config.line_width)
-                else:
-                    cross = self._create_cross(size, x_center, y_center, rotation)
-                    color = colors[1] if self.config.color_mode == 'color' else self.config.foreground_color
-                    ax.fill(cross[:, 0], cross[:, 1], color=color, alpha=0.8, edgecolor='white', linewidth=self.config.line_width)
+        for x_center, y_center, i, j, tile in tiles(ax, rep_x, rep_y, self._symmetry):
+            if (i + j) % 2 == 0:
+                star = self._create_star(8, size, size * 0.5, x_center, y_center, rotation)
+                color = colors[0] if self.config.color_mode == 'color' else self.config.foreground_color
+                tile.fill(star[:, 0], star[:, 1], color=color, alpha=0.8, edgecolor='white', linewidth=self.config.line_width)
+            else:
+                cross = self._create_cross(size, x_center, y_center, rotation)
+                color = colors[1] if self.config.color_mode == 'color' else self.config.foreground_color
+                tile.fill(cross[:, 0], cross[:, 1], color=color, alpha=0.8, edgecolor='white', linewidth=self.config.line_width)
 
     # --- Shape helpers ---
 

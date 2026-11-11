@@ -181,3 +181,58 @@ def test_penrose_thick_to_thin_ratio_is_golden():
     tiles = [t for t in penrose_p3(0.02) if all(abs(c) < 0.8 for xy in t[1] for c in xy)]
     thick = sum(t[0] for t in tiles)
     assert abs(thick / (len(tiles) - thick) - (1 + 5 ** 0.5) / 2) < 0.08
+
+
+def _islamic(pattern, symmetry):
+    from patterns.islamic import IslamicGeometryGenerator
+    from web.recorder import record_scene
+    params = dict(pattern_type=pattern, symmetry=symmetry, tile_size=0.15, repetitions_x=5, repetitions_y=4,
+                  rotation=10, interlace="simple", ornament_detail=1.3)
+    scene, _ = record_scene(IslamicGeometryGenerator(PatternConfig()), params)
+    return scene["prims"]
+
+
+@pytest.mark.parametrize("pattern", ["octagon_star", "hexagon_flower", "square_kufic", "girih_tiles", "morocco_zellige"])
+@pytest.mark.parametrize("symmetry,n", [("p2", 2), ("p4", 4), ("p6", 6)])
+def test_islamic_symmetry_takes_effect(pattern, symmetry, n):
+    """The 'symmetry' parameter was never read. Now p2/p4/p6 make every tile centre an n-fold rotation centre
+    (n = 2, 4, 6): rotating any drawn shape by 360/n about its tile centre gives another drawn shape."""
+    from patterns.symmetry import tile_centres
+    prims = _islamic(pattern, symmetry)
+    def centroid(p):  # mean of the distinct vertices (polygons repeat their first point at the end)
+        if p["t"] == "circle":
+            return [p["cx"], p["cy"]]
+        v = np.column_stack([p["x"], p["y"]])
+        return (v[:-1] if np.allclose(v[0], v[-1]) else v).mean(axis=0)
+    cents = np.array([centroid(p) for p in prims])
+    th = 2 * np.pi / n
+    rot = np.array([[np.cos(th), -np.sin(th)], [np.sin(th), np.cos(th)]])
+    centres = np.array([c[:2] for c in tile_centres(5, 4, symmetry)])
+    for c in centres:
+        near = cents[np.hypot(*(cents - c).T) < 0.12]
+        assert len(near)
+        for m in near:
+            r = (m - c) @ rot.T + c
+            assert np.min(np.hypot(*(cents - r).T)) < 1e-7, (pattern, symmetry, c, m)
+
+
+@pytest.mark.parametrize("symmetry,n", [("p4", 4), ("p6", 6)])
+def test_islamic_symmetry_lattice(symmetry, n):
+    """p4 needs a square lattice and p6 a hexagonal one: nearest neighbours of an interior tile centre are n
+    (4 or 6) at one distance, 360/n degrees apart."""
+    from patterns.symmetry import tile_centres
+    c = np.array([t[:2] for t in tile_centres(6, 6, symmetry)])
+    mid = c[np.argmin(np.hypot(*c.T))]
+    d = np.hypot(*(c - mid).T)
+    d1 = np.min(d[d > 1e-12])
+    nn = c[(d > 1e-12) & (d < d1 * (1 + 1e-9))] - mid
+    assert len(nn) == n
+    ang = np.sort(np.degrees(np.arctan2(nn[:, 1], nn[:, 0])) % 360)
+    assert np.allclose(np.diff(ang), 360 / n)
+
+
+def test_islamic_p1_is_the_old_rectangular_layout():
+    prims = _islamic("girih_tiles", "p1")
+    assert abs(np.mean(prims[0]["x"][:-1]) - (-1 + 0.5 * 2 / 5)) < 1e-12
+    assert abs(np.mean(prims[0]["y"][:-1]) - (-1 + 0.5 * 2 / 4)) < 1e-12
+    assert len(prims) == 20 * 6

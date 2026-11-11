@@ -20,7 +20,6 @@ export function buildParams(host, g, params, onChange) {
         v => onChange(name, isInt ? Math.round(v) : v));
     }
   }
-  if (g.id === 'islamic') host.insertAdjacentHTML('beforeend', '<p class="small mute">Symmetry is a parameter of the Python generator that its drawing code does not use (no effect, as on the desktop).</p>');
 }
 
 // Global settings; onChange(key, value) with keys of PatternConfig plus 'seed'.
