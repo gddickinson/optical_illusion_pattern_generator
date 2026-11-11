@@ -36,7 +36,8 @@ route('about', async () => {
   <code>fill</code>, <code>axhline</code>, <code>contour</code>, <code>imshow</code>, <code>scatter</code>). The JS engine
   (<code>web/static/engine.js</code> and <code>gen_*.js</code>) is a line-by-line port that makes the same calls into a
   drawing list, and <code>render.js</code> draws it on a canvas with matplotlib's sizes and colour tables. Voronoi diagrams
-  are computed in JS in place of SciPy's Qhull. Random patterns use a seeded generator (the <i>Seed</i> setting).</p>
+  are computed in JS in place of SciPy's Qhull; the Penrose (P3) and Ammann-Beenker tilings come from de Bruijn's
+  multigrid method in both languages. Random patterns use a seeded generator (the <i>Seed</i> setting).</p>
   <p>To check the port, <code>scripts/make_scene_fixture.py</code> runs the real Python generators against a recording
   axes and logs their NumPy random draws; the node test replays those draws through the engine and requires the same
   calls, coordinates and colours. The <a href="#/check">cross-check</a> page shows the two renders side by side.</p>

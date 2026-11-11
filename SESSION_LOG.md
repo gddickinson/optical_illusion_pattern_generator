@@ -19,12 +19,6 @@ Bugs fixed (each its own "Fix ..." commit, regression test in `tests/test_genera
 - README listed features that do not exist (flow fields, reaction-diffusion, circle packing, L-systems, strange
   attractors, Fibonacci tiling); corrected to the implemented generators.
 
-Left for George
-- IslamicGeometryGenerator's `symmetry` parameter is never used by its drawing code (no effect).
-- The 'penrose' and 'ammann_beenker' tessellations are random scatters of rhombi/octagons, not aperiodic tilings
-  (the README now says so); turning them into real tilings is a feature decision.
-- Five overlapping desktop scripts (ROADMAP "consolidate"); `advanced_pattern_generator.py` is 2,677 lines.
-
 Web interface
 - `web/`: FastAPI app (catalogue from the generators' own `get_parameters()`, Python PNG renders for the cross-check,
   POST /render) and a plain ES-module front end: Home, Studio, Gallery, Cross-check, About.
@@ -36,3 +30,20 @@ Web interface
   up to 0.1% boundary pixels allowed, none differ in the fixture).
 - Tests: `python -m pytest -q tests/` 77 passed; node engine test ok (132 cases); screenshots.py static and
   `--base http://127.0.0.1:8127` all ok, no phone overflow.
+
+## 2026-11-11 (later): fixes approved by George
+
+- Fix: `advanced_pattern_generator.py` kept its own copies of PatternConfig, ColorManager, PatternGenerator and the
+  six Art Studio generators (already drifting from `patterns/`); nothing imported them. It now imports `config.py`
+  and `patterns/` (2,677 -> 1,131 lines); all 156 variant/colour renders pixel-identical, GUI presets identical.
+- Fix: 'penrose' and 'ammann_beenker' tessellations were random overlapping scatters. Now real aperiodic tilings
+  by de Bruijn's multigrid (`patterns/aperiodic.py`): Penrose P3 from the pentagrid, Ammann-Beenker from the 4-grid.
+  Tests: edge length = tile_size, only P3 / A-B angles, interior edges shared by exactly 2 tiles, 360 degrees at
+  every interior vertex, thick:thin near the golden ratio.
+- Fix: Islamic `symmetry` now takes effect (`patterns/symmetry.py`): p1/p2 rectangular lattice, p4 square, p6
+  hexagonal; every tile centre an n-fold rotation centre (rotated copies added when the motif lacks that order).
+  p1 is pixel-identical to the old output; the default p4 now uses a square lattice.
+- JS ports `web/static/aperiodic.js`, `symmetry.js`; fixture regenerated: 138 cases, 7,498 drawing calls match.
+- Tests: `pytest tests/` 99 passed; node engine test ok; screenshots.py static (11 routes) and --base (6 routes)
+  all ok, phone overflow 0px; README screenshots refreshed.
+- Still open: five overlapping desktop scripts (ROADMAP "consolidate").

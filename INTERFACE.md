@@ -18,6 +18,8 @@
 | `fractals.py` | FractalGenerator (from V2) |
 | `curves.py` | MathematicalCurvesGenerator (from V2) |
 | `islamic.py`, `voronoi.py`, `cellular.py`, `tessellation.py` | Art Studio generators |
+| `symmetry.py` | Wallpaper symmetry p1/p2/p4/p6 for tiled motifs: tile_centres (lattices), TileAxes (n-fold copies), tiles() |
+| `aperiodic.py` | de Bruijn multigrid: penrose_p3 (pentagrid), ammann_beenker (4-grid) |
 | `presets.py` | PRESETS (the ten quick presets of V2 and the Art Studio) and apply_preset(app, key) used by both GUIs |
 
 `ui/`: DialogsMixin (`dialogs.py`); the app class is still in `advanced_pattern_generator.py`.
@@ -39,6 +41,7 @@
 | `static/colors.js`, `mpl_data.js` | Colour parsing, colormaps, ColorManager palettes; generated matplotlib tables |
 | `static/np.js` | linspace/arange as NumPy computes them; SeededRandom and ReplayRandom (np.random stand-ins) |
 | `static/voronoi.js` | Voronoi regions/ridges in scipy's form (half-plane clipping + circumcentres) |
+| `static/symmetry.js`, `static/aperiodic.js` | Ports of `patterns/symmetry.py` and `patterns/aperiodic.py` |
 | `static/engine.test.mjs` | Node test: engine vs `tests/fixtures/scenes.json` |
 
 ## Scripts and tests

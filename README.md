@@ -123,7 +123,7 @@ every push to main (one-time setup: Settings -> Pages -> Source: GitHub Actions)
 
 ```bash
 python -m pytest -q tests/                 # generators, API, static build, fixtures, and the node engine test
-node web/static/engine.test.mjs            # JS engine vs the Python generators (132 recorded cases)
+node web/static/engine.test.mjs            # JS engine vs the Python generators (138 recorded cases)
 ```
 
 `scripts/make_scene_fixture.py` records what the Python generators draw (and their random draws) into
