@@ -65,3 +65,42 @@ def test_ui_package_imports():
     """ui/__init__.py imported ui.app, which does not exist, so `import ui` raised ModuleNotFoundError."""
     import ui
     assert hasattr(ui.DialogsMixin, "show_about")
+
+
+class _FillLog:
+    def __init__(self):
+        self.fills = []
+
+    def fill(self, x, y, **kw):
+        self.fills.append((np.asarray(x, float), np.asarray(y, float)))
+
+
+def test_kanizsa_draws_three_pacmen_facing_the_centre():
+    """The bottom-left mask (theta > 7pi/6) & (theta < pi/2) was always empty, so only two shapes were drawn, and the
+    others' mouths did not face the illusory triangle. Each pac-man must be drawn, with its mouth towards (0, 0)."""
+    from matplotlib.path import Path as MPath
+    from patterns.illusions import OpticalIllusionGenerator
+    size, ax = 0.5, _FillLog()
+    OpticalIllusionGenerator(PatternConfig())._generate_kanizsa_triangle(ax, size, 1.0)
+    centers = [(0, size), (-size * 0.866, -size * 0.5), (size * 0.866, -size * 0.5)]
+    assert len(ax.fills) == 3
+    r = size * 0.3
+    for (x, y), (cx, cy) in zip(ax.fills, centers):
+        assert len(x) > 10
+        path = MPath(np.column_stack([x, y]))
+        to_centre = -np.array([cx, cy]) / np.hypot(cx, cy)
+        assert not path.contains_point((cx + 0.6 * r * to_centre[0], cy + 0.6 * r * to_centre[1]))  # the mouth
+        assert path.contains_point((cx - 0.6 * r * to_centre[0], cy - 0.6 * r * to_centre[1]))  # the body
+
+
+@pytest.mark.skipif(importlib.util.find_spec("tkinter") is None, reason="tkinter not installed")
+def test_kanizsa_original_script_same_fix():
+    """optical_illusion_generator.py carries its own copy of the Kanizsa code; it must match the patterns version."""
+    code = ("import sys; sys.path.insert(0, %r)\nimport numpy as np, optical_illusion_generator as o\n"
+            "from patterns.illusions import OpticalIllusionGenerator as G\nfrom config import PatternConfig\n"
+            "class L:\n  def __init__(s): s.f=[]\n  def fill(s, x, y, **k): s.f.append((list(x), list(y)))\n"
+            "a, b = L(), L()\no.OpticalIllusionGenerator(o.PatternConfig())._generate_kanizsa_triangle(a, 0.5, 1)\n"
+            "G(PatternConfig())._generate_kanizsa_triangle(b, 0.5, 1)\nassert a.f == b.f and len(a.f) == 3 and all(len(x) > 10 for x, y in a.f)\nprint('ok')\n") % str(ROOT)
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=ROOT,
+                       env=dict(os.environ, MPLBACKEND="Agg"), timeout=60)
+    assert r.returncode == 0 and "ok" in r.stdout, r.stderr[-600:]

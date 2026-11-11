@@ -319,19 +319,13 @@ class OpticalIllusionGenerator(PatternGenerator):
         circle_radius = size * 0.3
         centers = [(0, size), (-size*0.866, -size*0.5), (size*0.866, -size*0.5)]
 
-        for i, (cx, cy) in enumerate(centers):
-            theta = np.linspace(0, 2*np.pi, 100)
-            # Create pac-man by removing a wedge
-            if i == 0:  # Top circle, mouth facing down
-                mask = (theta > np.pi/6) & (theta < 11*np.pi/6)
-            elif i == 1:  # Bottom left, mouth facing up-right
-                mask = (theta > 7*np.pi/6) & (theta < np.pi/2)
-            else:  # Bottom right, mouth facing up-left
-                mask = (theta > np.pi/2) & (theta < 11*np.pi/6)
-
-            theta_filtered = theta[mask]
-            x = cx + circle_radius * np.cos(theta_filtered)
-            y = cy + circle_radius * np.sin(theta_filtered)
+        for (cx, cy) in centers:
+            # Pac-man: a disc with a 60-degree wedge cut out, the mouth facing the centre of the
+            # triangle, so the wedge edges line up with the illusory triangle's sides.
+            mouth = np.arctan2(-cy, -cx)
+            theta = np.linspace(mouth + np.pi/6, mouth + 2*np.pi - np.pi/6, 100)
+            x = np.concatenate([[cx], cx + circle_radius * np.cos(theta)])
+            y = np.concatenate([[cy], cy + circle_radius * np.sin(theta)])
             ax.fill(x, y, color=self.config.foreground_color, alpha=intensity)
 
     def _fig_to_array(self, fig) -> np.ndarray:
