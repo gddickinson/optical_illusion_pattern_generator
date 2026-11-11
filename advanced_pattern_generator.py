@@ -24,6 +24,7 @@ import random
 from scipy.spatial import Voronoi, voronoi_plot_2d
 from scipy.spatial.distance import pdist, squareform
 import colorsys
+from patterns.presets import apply_preset  # preset data shared with the web interface
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -2492,91 +2493,27 @@ Built with Python and passion for mathematical beauty
     # Preset loading methods
     def load_islamic_preset(self):
         """Load Islamic art preset"""
-        self.pattern_var.set("Islamic Geometry")
-        self.on_pattern_change()
-
-        if 'pattern_type' in self.parameter_widgets:
-            self.parameter_widgets['pattern_type']['var'].set('octagon_star')
-        if 'interlace' in self.parameter_widgets:
-            self.parameter_widgets['interlace']['var'].set('complex')
-
-        self.color_mode_var.set('color')
-        self.palette_var.set('earth')
-        logger.info("Loaded Islamic Art preset")
+        apply_preset(self, 'islamic_art')
 
     def load_organic_preset(self):
         """Load organic flow preset"""
-        self.pattern_var.set("Voronoi Diagrams")
-        self.on_pattern_change()
-
-        if 'distribution' in self.parameter_widgets:
-            self.parameter_widgets['distribution']['var'].set('poisson')
-        if 'color_by' in self.parameter_widgets:
-            self.parameter_widgets['color_by']['var'].set('distance')
-
-        self.color_mode_var.set('color')
-        self.palette_var.set('forest')
-        logger.info("Loaded Organic Flow preset")
+        apply_preset(self, 'organic_flow')
 
     def load_digital_preset(self):
         """Load digital grid preset"""
-        self.pattern_var.set("Cellular Automata")
-        self.on_pattern_change()
-
-        if 'automata_type' in self.parameter_widgets:
-            self.parameter_widgets['automata_type']['var'].set('rule_110')
-        if 'visualization' in self.parameter_widgets:
-            self.parameter_widgets['visualization']['var'].set('evolution')
-
-        self.color_mode_var.set('color')
-        self.palette_var.set('neon')
-        logger.info("Loaded Digital Grid preset")
+        apply_preset(self, 'digital_grid')
 
     def load_nature_preset(self):
         """Load nature patterns preset"""
-        self.pattern_var.set("Tessellations")
-        self.on_pattern_change()
-
-        if 'tessellation_type' in self.parameter_widgets:
-            self.parameter_widgets['tessellation_type']['var'].set('hexagonal')
-        if 'irregularity' in self.parameter_widgets:
-            self.parameter_widgets['irregularity']['var'].set(0.2)
-
-        self.color_mode_var.set('color')
-        self.palette_var.set('forest')
-        logger.info("Loaded Nature Patterns preset")
+        apply_preset(self, 'nature_patterns')
 
     def load_cosmic_preset(self):
         """Load cosmic spiral preset"""
-        self.pattern_var.set("Spiral")
-        self.on_pattern_change()
-
-        if 'spiral_type' in self.parameter_widgets:
-            self.parameter_widgets['spiral_type']['var'].set('logarithmic')
-        if 'overlapping_spirals' in self.parameter_widgets:
-            self.parameter_widgets['overlapping_spirals']['var'].set(3)
-        if 'gradient_effect' in self.parameter_widgets:
-            self.parameter_widgets['gradient_effect']['var'].set('angular')
-
-        self.color_mode_var.set('color')
-        self.palette_var.set('cosmic')
-        logger.info("Loaded Cosmic Spiral preset")
+        apply_preset(self, 'cosmic_spiral')
 
     def load_crystal_preset(self):
         """Load crystal growth preset"""
-        self.pattern_var.set("Voronoi Diagrams")
-        self.on_pattern_change()
-
-        if 'distribution' in self.parameter_widgets:
-            self.parameter_widgets['distribution']['var'].set('fibonacci')
-        if 'style' in self.parameter_widgets:
-            self.parameter_widgets['style']['var'].set('filled')
-        if 'relaxation_steps' in self.parameter_widgets:
-            self.parameter_widgets['relaxation_steps']['var'].set(3)
-
-        self.color_mode_var.set('color')
-        self.palette_var.set('ice')
-        logger.info("Loaded Crystal Growth preset")
+        apply_preset(self, 'crystal_growth')
 
     # Display control methods
     def zoom_in(self):
