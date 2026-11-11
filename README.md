@@ -8,12 +8,12 @@ An interactive desktop application for generating mathematical patterns, fractal
 
 ### Pattern Categories
 
-- **Spirals**: Archimedean, Logarithmic, Fermat, and Fibonacci (Golden) spirals with adjustable arms, density, and line variations
+- **Spirals**: Archimedean, Logarithmic, Fermat, and Fibonacci (Golden) spirals with adjustable arms, density, overlapping spirals and radial/angular gradients
 - **Interference**: Moire effects using concentric circles, waves, or grids
-- **Optical Illusions**: Hermann Grid, Scintillating Grid, Fraser Spiral, Cafe Wall, Muller-Lyer, Kanizsa Triangle, Rotating Snakes, Impossible (Penrose) Triangle
-- **Fractals**: Mandelbrot and Julia sets, Sierpinski triangles, Barnsley Ferns, Dragon Curves
-- **Mathematical Curves**: Lissajous figures, Rose curves, Epicycloids, Hypocycloids
-- **Generative Art** (Advanced version): Voronoi tessellations, flow fields, reaction-diffusion patterns, circle packing, L-systems, strange attractors
+- **Optical Illusions** (V2): Hermann Grid, Scintillating Grid, Fraser Spiral, Cafe Wall, Zollner, Muller-Lyer, Kanizsa Triangle, Rotating Snakes, Impossible (Penrose) Triangle
+- **Fractals** (V2): Mandelbrot and Julia sets, Sierpinski triangles, Barnsley Ferns, Dragon Curves
+- **Mathematical Curves** (V2): Lissajous figures, Rose curves, Epicycloids, Hypocycloids, Cardioids, Astroids, Cycloids
+- **Generative Art** (Advanced version): Islamic geometric patterns, Voronoi diagrams (with Lloyd relaxation), cellular automata (Game of Life, elementary rules 30/90/110, Brian's Brain, Langton's ant) and tessellations (regular, hexagonal, triangular, Truchet, and random Penrose-style rhombi / Ammann-Beenker-style octagons)
 
 ### Tools and Controls
 
@@ -21,7 +21,7 @@ An interactive desktop application for generating mathematical patterns, fractal
 - **Animation Engine**: Animate patterns by cycling through rotation, phase, or other parameters
 - **Quick Presets**: Instantly load configurations for Golden Spiral, Psychedelic, and other popular patterns
 - **Export/Import**: Save and load pattern configurations as JSON
-- **High-Resolution Export**: Save patterns as PNG or JPG
+- **High-Resolution Export**: Save patterns as PNG or JPG (and SVG in the advanced version)
 
 ## Application Versions
 
@@ -31,9 +31,9 @@ An interactive desktop application for generating mathematical patterns, fractal
 | `optical_illusion_generator_V2.py` | Expanded version with more illusions and improved UI (~63k) |
 | `enhanced_pattern_generator.py` | Extended generator with additional mathematical curves (~44k) |
 | `enhanced_pattern_generator_V2.py` | Further expanded with more pattern types (~102k) |
-| `advanced_pattern_generator.py` | Full-featured "Mathematical Art Studio" with generative art, Voronoi, flow fields, L-systems, and strange attractors (~116k) |
+| `advanced_pattern_generator.py` | Full-featured "Mathematical Art Studio" with spirals, interference, Islamic geometry, Voronoi diagrams, cellular automata and tessellations (~116k) |
 
-Each version builds on the previous, adding more pattern types and UI refinements. The `advanced_pattern_generator.py` is the most feature-rich.
+Each version builds on the previous, adding more pattern types and UI refinements. The `advanced_pattern_generator.py` is the most feature-rich for generative art; the optical illusions, fractals and mathematical curves are in `optical_illusion_generator_V2.py`.
 
 ## Architecture
 
@@ -78,14 +78,13 @@ python optical_illusion_generator_V2.py
 ## Example Patterns
 
 The generator can produce patterns including:
-- Golden Spiral with Fibonacci tiling
+- Golden Spiral (Fibonacci spiral)
 - Mandelbrot and Julia set fractals with custom color maps
 - Moire interference patterns from overlapping grids
 - Classic optical illusions (Hermann Grid, Cafe Wall, etc.)
 - Lissajous curves and Rose curves
-- Voronoi tessellations and flow fields
-- L-system fractals (Koch snowflake, Hilbert curve, etc.)
-- Strange attractors (Lorenz, Rossler)
+- Voronoi diagrams and Islamic geometric patterns
+- Cellular automata and Truchet / hexagonal tessellations
 
 ## GUI Framework
 
