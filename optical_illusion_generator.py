@@ -144,8 +144,8 @@ class SpiralGenerator(PatternGenerator):
         """Convert matplotlib figure to numpy array"""
         try:
             fig.canvas.draw()
-            buf = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
-            buf = buf.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+            # canvas.tostring_rgb() was removed in matplotlib 3.10; buffer_rgba() works on all versions
+            buf = np.asarray(fig.canvas.buffer_rgba())[..., :3].copy()
             return buf
         except Exception as e:
             logger.error(f"Error converting figure to array: {e}")
@@ -218,8 +218,8 @@ class InterferenceGenerator(PatternGenerator):
         """Convert matplotlib figure to numpy array"""
         try:
             fig.canvas.draw()
-            buf = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
-            buf = buf.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+            # canvas.tostring_rgb() was removed in matplotlib 3.10; buffer_rgba() works on all versions
+            buf = np.asarray(fig.canvas.buffer_rgba())[..., :3].copy()
             return buf
         except Exception as e:
             logger.error(f"Error converting figure to array: {e}")
@@ -337,8 +337,8 @@ class OpticalIllusionGenerator(PatternGenerator):
     def _fig_to_array(self, fig) -> np.ndarray:
         """Convert matplotlib figure to numpy array"""
         fig.canvas.draw()
-        buf = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
-        buf = buf.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+        # canvas.tostring_rgb() was removed in matplotlib 3.10; buffer_rgba() works on all versions
+        buf = np.asarray(fig.canvas.buffer_rgba())[..., :3].copy()
         return buf
 
 class OpticalIllusionApp:
