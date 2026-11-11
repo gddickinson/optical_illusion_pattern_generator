@@ -58,3 +58,10 @@ def test_desktop_script_generators_render(mod):
     r = subprocess.run([sys.executable, "-c", SCRIPT.format(root=str(ROOT), mod=mod)], capture_output=True, text=True,
                        env=env, cwd=ROOT, timeout=120)
     assert r.returncode == 0 and "ok" in r.stdout, r.stderr[-800:]
+
+
+@pytest.mark.skipif(importlib.util.find_spec("tkinter") is None, reason="tkinter not installed")
+def test_ui_package_imports():
+    """ui/__init__.py imported ui.app, which does not exist, so `import ui` raised ModuleNotFoundError."""
+    import ui
+    assert hasattr(ui.DialogsMixin, "show_about")

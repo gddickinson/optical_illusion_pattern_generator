@@ -2,10 +2,12 @@
 UI components for the Advanced Mathematical Art Studio.
 
 Submodules:
-- app: Main AdvancedArtStudio application class
-- dialogs: Dialog helper methods (shortcuts, about, pattern guide)
+- dialogs: DialogsMixin (shortcuts, about, pattern guide dialogs)
+
+The main application class, AdvancedArtStudio, still lives in advanced_pattern_generator.py
+(the planned ui/app.py was never extracted).
 """
 
-from ui.app import AdvancedArtStudio
+from ui.dialogs import DialogsMixin
 
-__all__ = ['AdvancedArtStudio']
+__all__ = ['DialogsMixin']
