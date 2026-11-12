@@ -46,4 +46,18 @@ Web interface
 - JS ports `web/static/aperiodic.js`, `symmetry.js`; fixture regenerated: 138 cases, 7,498 drawing calls match.
 - Tests: `pytest tests/` 99 passed; node engine test ok; screenshots.py static (11 routes) and --base (6 routes)
   all ok, phone overflow 0px; README screenshots refreshed.
-- Still open: five overlapping desktop scripts (ROADMAP "consolidate").
+
+## 2026-11-11 (later): desktop scripts deduplicated
+
+- Fix: `enhanced_pattern_generator_V2.py` imports PatternConfig, ColorManager, PatternGenerator, SpiralGenerator and
+  InterferenceGenerator from `config.py`/`patterns/` (its copies were behaviourally identical); 2,410 -> 2,145 lines.
+  All 92 variant/colour renders pixel-identical, GUI presets identical, GA builds. Its Islamic/Voronoi/Cellular/
+  Tessellation generators are simplified versions with different parameters and output, so they stay (switching
+  them to `patterns/` would change what the app draws: George's call).
+- Fix: `optical_illusion_generator.py` and `enhanced_pattern_generator.py` moved to `_archive/` (README there): fully
+  covered by their V2 versions (original's patterns pixel-identical in V2; enhanced v1's GA/animation code identical
+  in V2, its demo spiral reproducible). Nothing imported them; docs, About/Home text and tests updated.
+- Tests: `pytest tests/` 97 passed (the archived scripts' subprocess tests removed); node engine test 138 cases ok;
+  screenshots.py static and --base (8127) all ok, phone overflow 0px.
+- Still open: three maintained desktop apps (V2, enhanced V2, advanced) with overlapping GUIs (ROADMAP "consolidate");
+  enhanced V2's simplified generative-art generators.

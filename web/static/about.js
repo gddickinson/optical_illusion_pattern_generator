@@ -4,7 +4,7 @@ import { loadCatalog } from './ui.js';
 
 const SCRIPTS = [
   ['optical_illusion_generator_V2.py', 'Expanded version with more illusions, fractals and mathematical curves'],
-  ['enhanced_pattern_generator_V2.py', 'Further expanded with more pattern types'],
+  ['enhanced_pattern_generator_V2.py', 'Genetic-algorithm evolution, aesthetic scoring and multi-parameter animation'],
   ['advanced_pattern_generator.py', '"Mathematical Art Studio": spirals, interference, Islamic geometry, Voronoi, cellular automata, tessellations'],
 ];
 
