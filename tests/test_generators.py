@@ -46,8 +46,7 @@ img = m.SpiralGenerator(cfg).generate()
 assert img.ndim == 3 and img.shape[2] == 3, img.shape
 print('ok')
 """
-SCRIPTS = ["optical_illusion_generator", "optical_illusion_generator_V2", "enhanced_pattern_generator",
-           "enhanced_pattern_generator_V2", "advanced_pattern_generator"]
+SCRIPTS = ["optical_illusion_generator_V2", "enhanced_pattern_generator_V2", "advanced_pattern_generator"]  # (+ _archive/)
 
 
 # The desktop scripts call matplotlib.use('TkAgg'), which cannot load without a display (e.g. Linux CI).
@@ -95,19 +94,6 @@ def test_kanizsa_draws_three_pacmen_facing_the_centre():
         to_centre = -np.array([cx, cy]) / np.hypot(cx, cy)
         assert not path.contains_point((cx + 0.6 * r * to_centre[0], cy + 0.6 * r * to_centre[1]))  # the mouth
         assert path.contains_point((cx - 0.6 * r * to_centre[0], cy - 0.6 * r * to_centre[1]))  # the body
-
-
-@pytest.mark.skipif(NO_TK, reason="tkinter or a display not available")
-def test_kanizsa_original_script_same_fix():
-    """optical_illusion_generator.py carries its own copy of the Kanizsa code; it must match the patterns version."""
-    code = ("import sys; sys.path.insert(0, %r)\nimport numpy as np, optical_illusion_generator as o\n"
-            "from patterns.illusions import OpticalIllusionGenerator as G\nfrom config import PatternConfig\n"
-            "class L:\n  def __init__(s): s.f=[]\n  def fill(s, x, y, **k): s.f.append((list(x), list(y)))\n"
-            "a, b = L(), L()\no.OpticalIllusionGenerator(o.PatternConfig())._generate_kanizsa_triangle(a, 0.5, 1)\n"
-            "G(PatternConfig())._generate_kanizsa_triangle(b, 0.5, 1)\nassert a.f == b.f and len(a.f) == 3 and all(len(x) > 10 for x, y in a.f)\nprint('ok')\n") % str(ROOT)
-    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=ROOT,
-                       env=dict(os.environ, MPLBACKEND="Agg"), timeout=60)
-    assert r.returncode == 0 and "ok" in r.stdout, r.stderr[-600:]
 
 
 @pytest.mark.skipif(NO_TK, reason="tkinter or a display not available")

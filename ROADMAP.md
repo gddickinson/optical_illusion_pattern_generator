@@ -1,6 +1,7 @@
 # Optical Illusion & Pattern Generator — Roadmap
 
 ## Current State
+(2026-11-11: the original and first enhanced scripts were moved to `_archive/`, superseded by their V2 versions; the generators are shared through `patterns/`.)
 Five standalone generator scripts of increasing complexity: `optical_illusion_generator.py` (original), `optical_illusion_generator_V2.py`, `enhanced_pattern_generator.py`, `enhanced_pattern_generator_V2.py`, and `advanced_pattern_generator.py` (most feature-rich). Built with tkinter + matplotlib. Uses proper OOP with `PatternConfig` dataclass and `PatternGenerator` ABC. The advanced version includes Voronoi, flow fields, L-systems, and strange attractors. All files are very large (30K-116K characters) with no modularization.
 
 ## Short-term Improvements

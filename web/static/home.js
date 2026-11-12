@@ -6,7 +6,7 @@ const DOORS = [
   ['#/studio', 'Studio', 'The generator: nine pattern families, every parameter of the desktop apps, presets, animation, PNG export and the JSON config files.'],
   ['#/gallery', 'Gallery', 'All 49 patterns at their default settings, drawn live in your browser. Click one to open it in the studio.'],
   ['#/check', 'Cross-check', 'The browser drawing next to the Python/matplotlib render of the same settings, with the same random numbers.'],
-  ['#/about', 'About', 'What the project is, the five desktop scripts, how to run the desktop and web apps, and how the port is tested.'],
+  ['#/about', 'About', 'What the project is, the desktop scripts, how to run the desktop and web apps, and how the port is tested.'],
 ];
 
 route('home', async () => {

@@ -27,13 +27,11 @@ An interactive desktop application for generating mathematical patterns, fractal
 
 | File | Description |
 |------|-------------|
-| `optical_illusion_generator.py` | Original version with core illusion patterns (~30k) |
-| `optical_illusion_generator_V2.py` | Expanded version with more illusions and improved UI (~63k) |
-| `enhanced_pattern_generator.py` | Extended generator with additional mathematical curves (~44k) |
-| `enhanced_pattern_generator_V2.py` | Further expanded with more pattern types (~102k) |
-| `advanced_pattern_generator.py` | Full-featured "Mathematical Art Studio" with spirals, interference, Islamic geometry, Voronoi diagrams, cellular automata and tessellations (~116k) |
+| `optical_illusion_generator_V2.py` | Expanded version with more illusions and improved UI |
+| `enhanced_pattern_generator_V2.py` | Further expanded with more pattern types |
+| `advanced_pattern_generator.py` | Full-featured "Mathematical Art Studio" with spirals, interference, Islamic geometry, Voronoi diagrams, cellular automata and tessellations |
 
-Each version builds on the previous, adding more pattern types and UI refinements. The `advanced_pattern_generator.py` is the most feature-rich for generative art; the optical illusions, fractals and mathematical curves are in `optical_illusion_generator_V2.py`.
+The original `optical_illusion_generator.py` and `enhanced_pattern_generator.py` are superseded by their V2 versions and kept in `_archive/` (see its README). Each version builds on the previous, adding more pattern types and UI refinements. The `advanced_pattern_generator.py` is the most feature-rich for generative art; the optical illusions, fractals and mathematical curves are in `optical_illusion_generator_V2.py`.
 
 ## Architecture
 

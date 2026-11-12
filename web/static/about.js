@@ -3,9 +3,7 @@ import { route, app, esc, list } from './core.js';
 import { loadCatalog } from './ui.js';
 
 const SCRIPTS = [
-  ['optical_illusion_generator.py', 'Original version with core illusion patterns'],
   ['optical_illusion_generator_V2.py', 'Expanded version with more illusions, fractals and mathematical curves'],
-  ['enhanced_pattern_generator.py', 'Extended generator with additional mathematical curves'],
   ['enhanced_pattern_generator_V2.py', 'Further expanded with more pattern types'],
   ['advanced_pattern_generator.py', '"Mathematical Art Studio": spirals, interference, Islamic geometry, Voronoi, cellular automata, tessellations'],
 ];
@@ -18,7 +16,8 @@ route('about', async () => {
   <h2>The desktop scripts</h2>
   <div class="scroll"><table><tr><th>File</th><th>Description</th></tr>
   ${list(SCRIPTS, ([f, d]) => `<tr><td><code>${f}</code></td><td>${esc(d)}</td></tr>`)}</table></div>
-  <p>Each builds on the previous one. The web offers the generators of the two most complete: the illusions, fractals
+  <p>Each builds on the previous one; the first original and enhanced versions, superseded by these, are in
+  <code>_archive/</code>. The web offers the generators of the two most complete: the illusions, fractals
   and curves of <code>optical_illusion_generator_V2.py</code> and the generative art of
   <code>advanced_pattern_generator.py</code> (both now kept in the <code>patterns/</code> package).</p>
   <h2>Generators on this site</h2>

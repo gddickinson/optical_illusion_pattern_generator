@@ -3,9 +3,9 @@
 ## Desktop scripts (tkinter + matplotlib, run directly)
 | File | Contents |
 |------|----------|
-| `optical_illusion_generator.py` | Original app: PatternConfig, Spiral/Interference/OpticalIllusion generators, OpticalIllusionApp |
 | `optical_illusion_generator_V2.py` | V2 app: own Spiral/Interference; imports OpticalIllusion, Fractal, MathematicalCurves generators and presets from `patterns/` |
-| `enhanced_pattern_generator.py`, `enhanced_pattern_generator_V2.py` | Enhanced apps (genetic algorithm, aesthetic analyser, more generators) |
+| `enhanced_pattern_generator_V2.py` | Enhanced app: genetic algorithm, aesthetic analyser, multi-parameter animation; shared config/Spiral/Interference from `config.py`/`patterns/`, its own simplified Islamic/Voronoi/Cellular/Tessellation generators |
+| `_archive/` | Superseded scripts (`optical_illusion_generator.py`, `enhanced_pattern_generator.py`), see `_archive/README.md` |
 | `advanced_pattern_generator.py` | "Mathematical Art Studio" (AdvancedArtStudio, the tkinter app); generators from `patterns/`, config from `config.py`, presets from `patterns/presets.py` |
 | `config.py` | PatternConfig dataclass, ColorManager (palettes, HSV palette, interpolation) |
 
