@@ -236,3 +236,16 @@ def test_islamic_p1_is_the_old_rectangular_layout():
     assert abs(np.mean(prims[0]["x"][:-1]) - (-1 + 0.5 * 2 / 5)) < 1e-12
     assert abs(np.mean(prims[0]["y"][:-1]) - (-1 + 0.5 * 2 / 4)) < 1e-12
     assert len(prims) == 20 * 6
+
+
+@pytest.mark.skipif(NO_TK, reason="tkinter or a display not available")
+def test_enhanced_v2_uses_the_shared_classes():
+    """enhanced_pattern_generator_V2.py carried copies of PatternConfig, ColorManager, PatternGenerator and the Spiral and
+    Interference generators identical in behaviour to config.py / patterns/; it must import them."""
+    code = ("import sys; sys.path.insert(0, %r)\nimport enhanced_pattern_generator_V2 as e, patterns, config\n"
+            "names = ['PatternGenerator', 'SpiralGenerator', 'InterferenceGenerator']\n"
+            "assert all(getattr(e, n) is getattr(patterns, n) for n in names)\n"
+            "assert e.PatternConfig is config.PatternConfig and e.ColorManager is config.ColorManager\nprint('ok')\n") % str(ROOT)
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=ROOT,
+                       env=dict(os.environ, MPLBACKEND="Agg"), timeout=60)
+    assert r.returncode == 0 and "ok" in r.stdout, r.stderr[-600:]
