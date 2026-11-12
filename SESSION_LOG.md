@@ -60,4 +60,12 @@ Web interface
 - Tests: `pytest tests/` 97 passed (the archived scripts' subprocess tests removed); node engine test 138 cases ok;
   screenshots.py static and --base (8127) all ok, phone overflow 0px.
 - Still open: three maintained desktop apps (V2, enhanced V2, advanced) with overlapping GUIs (ROADMAP "consolidate");
-  enhanced V2's simplified generative-art generators.
+
+
+## 2026-11-11 (later): enhanced V2 on the shared generators (approved by George)
+
+- Fix: `enhanced_pattern_generator_V2.py`'s Islamic/Voronoi/Cellular/Tessellation generators were simplified copies
+  (no symmetry, random "tilings", fewer options). They are now thin subclasses of the `patterns/` generators that keep
+  the app's own parameter set (all values accepted by `patterns/`; the rest take the `patterns/` defaults). Output
+  changes to the maintained versions. Test: V2's classes subclass `patterns/` without overriding generate() and render
+  identically to them. GUI presets and GA fitness evaluation checked.

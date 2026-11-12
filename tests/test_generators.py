@@ -235,3 +235,29 @@ def test_enhanced_v2_uses_the_shared_classes():
     r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=ROOT,
                        env=dict(os.environ, MPLBACKEND="Agg"), timeout=60)
     assert r.returncode == 0 and "ok" in r.stdout, r.stderr[-600:]
+
+
+@pytest.mark.skipif(NO_TK, reason="tkinter or a display not available")
+def test_enhanced_v2_generative_art_renders_through_patterns():
+    """enhanced_pattern_generator_V2.py drew Islamic/Voronoi/Cellular/Tessellation patterns with its own simplified copies
+    (no symmetry, random 'tilings'). It must render through the patterns/ generators, keeping its own parameter set,
+    every value of which the patterns/ generator accepts."""
+    code = ("import sys; sys.path.insert(0, %r)\nimport numpy as np, enhanced_pattern_generator_V2 as e, patterns, config\n"
+            "for n in ['IslamicGeometryGenerator', 'VoronoiGenerator', 'CellularAutomataGenerator', 'TessellationGenerator']:\n"
+            "    V, P = getattr(e, n), getattr(patterns, n)\n"
+            "    assert issubclass(V, P) and V.generate is P.generate, n\n"
+            "    cfg = config.PatternConfig(width=200, height=150)\n"
+            "    vs, ps = V(cfg).get_parameters(), P(cfg).get_parameters()\n"
+            "    for k, s in vs.items():\n"
+            "        assert k in ps, (n, k)\n"
+            "        if s['type'] == 'choice': assert set(s['choices']) <= set(ps[k]['choices']), (n, k)\n"
+            "        else: assert ps[k]['range'][0] <= s['range'][0] and s['range'][1] <= ps[k]['range'][1], (n, k)\n"
+            "    p = {k: s['default'] for k, s in vs.items()}\n"
+            "    p.update({k: v for k, v in dict(grid_size=50, generations=4).items() if k in vs})\n"
+            "    np.random.seed(1); a = V(cfg).generate(**p)\n"
+            "    np.random.seed(1); b = P(cfg).generate(**p)\n"
+            "    assert (a == b).all(), n\n"
+            "print('ok')\n") % str(ROOT)
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=ROOT,
+                       env=dict(os.environ, MPLBACKEND="Agg"), timeout=120)
+    assert r.returncode == 0 and "ok" in r.stdout, r.stderr[-600:]

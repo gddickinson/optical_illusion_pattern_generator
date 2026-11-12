@@ -33,8 +33,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # PatternConfig, ColorManager and the Spiral / Interference generators are shared with the other apps and the
-# web interface (config.py, patterns/); the generators below are this app's own simplified versions.
+# web interface (config.py, patterns/), as are the generative-art generators below.
 from config import PatternConfig, ColorManager  # noqa: E402
+import patterns  # noqa: E402
 from patterns import PatternGenerator, SpiralGenerator, InterferenceGenerator  # noqa: E402
 
 @dataclass
@@ -406,9 +407,10 @@ class AnimationParameter:
             logger.error(f"Error calculating animated value for {self.name}: {e}")
             return self.current_value
 
-# Add the remaining generators (simplified versions for space)
-class IslamicGeometryGenerator(PatternGenerator):
-    """Generates Islamic geometric patterns"""
+# Generative-art generators: the shared patterns/ implementations, exposed with this app's parameter set
+# (its UI and genetic algorithm use get_parameters(); parameters not listed take the patterns/ defaults).
+class IslamicGeometryGenerator(patterns.IslamicGeometryGenerator):
+    """patterns.IslamicGeometryGenerator with the enhanced app's parameters."""
 
     def get_parameters(self) -> Dict[str, Any]:
         return {
@@ -420,49 +422,9 @@ class IslamicGeometryGenerator(PatternGenerator):
             'interlace': {'type': 'choice', 'choices': ['none', 'simple', 'complex'], 'default': 'simple'}
         }
 
-    def generate(self, **kwargs) -> np.ndarray:
-        """Generate Islamic geometric pattern"""
-        try:
-            pattern_type = kwargs.get('pattern_type', 'octagon_star')
-            tile_size = kwargs.get('tile_size', 0.2)
-            rep_x = kwargs.get('repetitions_x', 8)
-            rep_y = kwargs.get('repetitions_y', 6)
-            rotation = kwargs.get('rotation', 0)
 
-            fig, ax = plt.subplots(figsize=(self.config.width/100, self.config.height/100))
-            ax.set_xlim(-1, 1)
-            ax.set_ylim(-1, 1)
-            ax.set_aspect('equal')
-            ax.axis('off')
-
-            colors = ColorManager.get_palette(self.config.color_palette, 4)
-
-            for i in range(rep_x):
-                for j in range(rep_y):
-                    x_center = -1 + (i + 0.5) * 2 / rep_x
-                    y_center = -1 + (j + 0.5) * 2 / rep_y
-
-                    if pattern_type == 'octagon_star':
-                        # Simple octagon
-                        angles = np.linspace(0, 2*np.pi, 9) + np.radians(rotation)
-                        x = x_center + tile_size * np.cos(angles)
-                        y = y_center + tile_size * np.sin(angles)
-                        color = colors[0] if self.config.color_mode == 'color' else self.config.foreground_color
-                        ax.fill(x, y, color=color, alpha=0.8, edgecolor='black', linewidth=self.config.line_width)
-
-            fig.patch.set_facecolor(self.config.background_color)
-            plt.tight_layout()
-
-            return self._fig_to_array(fig)
-
-        except Exception as e:
-            logger.error(f"Error generating Islamic pattern: {e}")
-            raise
-        finally:
-            plt.close(fig)
-
-class VoronoiGenerator(PatternGenerator):
-    """Generates Voronoi diagram patterns"""
+class VoronoiGenerator(patterns.VoronoiGenerator):
+    """patterns.VoronoiGenerator with the enhanced app's parameters."""
 
     def get_parameters(self) -> Dict[str, Any]:
         return {
@@ -473,68 +435,9 @@ class VoronoiGenerator(PatternGenerator):
             'relaxation_steps': {'type': 'int', 'range': (0, 10), 'default': 0}
         }
 
-    def generate(self, **kwargs) -> np.ndarray:
-        """Generate Voronoi diagram pattern"""
-        try:
-            num_points = kwargs.get('num_points', 50)
-            distribution = kwargs.get('distribution', 'random')
-            style = kwargs.get('style', 'both')
 
-            # Generate points
-            if distribution == 'random':
-                points = np.random.uniform(-1, 1, (num_points, 2))
-            elif distribution == 'grid':
-                side = int(np.sqrt(num_points))
-                x = np.linspace(-0.9, 0.9, side)
-                y = np.linspace(-0.9, 0.9, side)
-                xx, yy = np.meshgrid(x, y)
-                points = np.column_stack([xx.ravel(), yy.ravel()])[:num_points]
-            else:
-                points = np.random.uniform(-1, 1, (num_points, 2))
-
-            # Create Voronoi diagram
-            vor = Voronoi(points)
-
-            fig, ax = plt.subplots(figsize=(self.config.width/100, self.config.height/100))
-            ax.set_xlim(-1, 1)
-            ax.set_ylim(-1, 1)
-            ax.set_aspect('equal')
-            ax.axis('off')
-
-            colors = ColorManager.get_palette(self.config.color_palette, num_points)
-
-            # Draw regions
-            for point_idx in range(len(vor.points)):
-                region_idx = vor.point_region[point_idx]
-                region = vor.regions[region_idx]
-
-                if len(region) > 0 and -1 not in region:
-                    vertices = vor.vertices[region]
-                    if len(vertices) > 2:
-                        color = colors[point_idx % len(colors)] if self.config.color_mode == 'color' else self.config.foreground_color
-                        if style in ['filled', 'both']:
-                            ax.fill(vertices[:, 0], vertices[:, 1], color=color, alpha=0.7)
-
-            # Draw edges
-            if style in ['edges', 'both']:
-                for ridge in vor.ridge_vertices:
-                    if -1 not in ridge:
-                        vertices = vor.vertices[ridge]
-                        ax.plot(vertices[:, 0], vertices[:, 1], 'k-', linewidth=self.config.line_width)
-
-            fig.patch.set_facecolor(self.config.background_color)
-            plt.tight_layout()
-
-            return self._fig_to_array(fig)
-
-        except Exception as e:
-            logger.error(f"Error generating Voronoi pattern: {e}")
-            raise
-        finally:
-            plt.close(fig)
-
-class CellularAutomataGenerator(PatternGenerator):
-    """Generates cellular automata patterns"""
+class CellularAutomataGenerator(patterns.CellularAutomataGenerator):
+    """patterns.CellularAutomataGenerator with the enhanced app's parameters."""
 
     def get_parameters(self) -> Dict[str, Any]:
         return {
@@ -545,60 +448,9 @@ class CellularAutomataGenerator(PatternGenerator):
             'visualization': {'type': 'choice', 'choices': ['final_state', 'evolution'], 'default': 'final_state'}
         }
 
-    def generate(self, **kwargs) -> np.ndarray:
-        """Generate cellular automata pattern"""
-        try:
-            automata_type = kwargs.get('automata_type', 'game_of_life')
-            grid_size = kwargs.get('grid_size', 100)
-            generations = kwargs.get('generations', 50)
-            initial_density = kwargs.get('initial_density', 0.3)
 
-            # Initialize grid
-            grid = np.random.choice([0, 1], size=(grid_size, grid_size), p=[1-initial_density, initial_density])
-
-            # Simple Game of Life implementation
-            if automata_type == 'game_of_life':
-                for _ in range(generations):
-                    new_grid = np.zeros_like(grid)
-                    for i in range(1, grid_size-1):
-                        for j in range(1, grid_size-1):
-                            neighbors = np.sum(grid[i-1:i+2, j-1:j+2]) - grid[i, j]
-                            if grid[i, j] == 1:
-                                if neighbors < 2 or neighbors > 3:
-                                    new_grid[i, j] = 0
-                                else:
-                                    new_grid[i, j] = 1
-                            else:
-                                if neighbors == 3:
-                                    new_grid[i, j] = 1
-                    grid = new_grid
-
-            fig, ax = plt.subplots(figsize=(self.config.width/100, self.config.height/100))
-
-            if self.config.color_mode == 'color':
-                colors = ColorManager.get_palette(self.config.color_palette, 3)
-                cmap = LinearSegmentedColormap.from_list('custom', [self.config.background_color] + colors[:2])
-            else:
-                cmap = 'gray'
-
-            ax.imshow(grid, cmap=cmap, origin='lower')
-            ax.set_xlim(0, grid_size)
-            ax.set_ylim(0, grid_size)
-            ax.set_aspect('equal')
-            ax.axis('off')
-            fig.patch.set_facecolor(self.config.background_color)
-            plt.tight_layout()
-
-            return self._fig_to_array(fig)
-
-        except Exception as e:
-            logger.error(f"Error generating cellular automata: {e}")
-            raise
-        finally:
-            plt.close(fig)
-
-class TessellationGenerator(PatternGenerator):
-    """Generates tessellation patterns"""
+class TessellationGenerator(patterns.TessellationGenerator):
+    """patterns.TessellationGenerator with the enhanced app's parameters."""
 
     def get_parameters(self) -> Dict[str, Any]:
         return {
@@ -609,62 +461,7 @@ class TessellationGenerator(PatternGenerator):
             'color_scheme': {'type': 'choice', 'choices': ['alternating', 'gradient', 'random'], 'default': 'alternating'}
         }
 
-    def generate(self, **kwargs) -> np.ndarray:
-        """Generate tessellation pattern"""
-        try:
-            tess_type = kwargs.get('tessellation_type', 'hexagonal')
-            tile_size = kwargs.get('tile_size', 0.1)
-            irregularity = kwargs.get('irregularity', 0.0)
 
-            fig, ax = plt.subplots(figsize=(self.config.width/100, self.config.height/100))
-            ax.set_xlim(-1, 1)
-            ax.set_ylim(-1, 1)
-            ax.set_aspect('equal')
-            ax.axis('off')
-
-            colors = ColorManager.get_palette(self.config.color_palette, 6)
-
-            if tess_type == 'hexagonal':
-                hex_height = tile_size * np.sqrt(3)
-                hex_width = tile_size * 2
-
-                rows = int(2 / hex_height) + 2
-                cols = int(2 / (hex_width * 0.75)) + 2
-
-                for row in range(rows):
-                    for col in range(cols):
-                        x_offset = col * hex_width * 0.75
-                        y_offset = row * hex_height
-
-                        if row % 2 == 1:
-                            x_offset += hex_width * 0.375
-
-                        x_center = -1 + x_offset
-                        y_center = -1 + y_offset
-
-                        # Add irregularity
-                        if irregularity > 0:
-                            x_center += np.random.uniform(-irregularity, irregularity) * tile_size
-                            y_center += np.random.uniform(-irregularity, irregularity) * tile_size
-
-                        # Create hexagon
-                        angles = np.linspace(0, 2*np.pi, 7)
-                        x = x_center + tile_size * np.cos(angles)
-                        y = y_center + tile_size * np.sin(angles)
-
-                        color = colors[(row + col) % len(colors)] if self.config.color_mode == 'color' else self.config.foreground_color
-                        ax.fill(x, y, color=color, alpha=0.8, edgecolor='black', linewidth=self.config.line_width)
-
-            fig.patch.set_facecolor(self.config.background_color)
-            plt.tight_layout()
-
-            return self._fig_to_array(fig)
-
-        except Exception as e:
-            logger.error(f"Error generating tessellation: {e}")
-            raise
-        finally:
-            plt.close(fig)
 
 # Advanced Art Studio Application
 class AdvancedArtStudio:
