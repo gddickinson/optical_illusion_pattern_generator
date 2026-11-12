@@ -23,6 +23,7 @@ def serve(directory: Path) -> str:
         def log_message(self, *a):
             pass
     handler = functools.partial(Quiet, directory=str(directory))
+    http.server.ThreadingHTTPServer.request_queue_size = 128  # many ES modules load at once
     srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return f"http://127.0.0.1:{srv.server_address[1]}/"
